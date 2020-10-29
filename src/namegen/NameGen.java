@@ -76,11 +76,13 @@ public class NameGen{
 			int seedB = 710 + (num % 19);
             int seedC = num <= last ? seed : seedB;
 
-			if(name.charAt(i) != ' '){
-                result.append(name.charAt(i) + Character.toString(seedC));
+            char c = name.charAt(i);
+
+			if(!Character.isWhitespace(c)){
+                result.append(Character.toString(c) + Character.toString(seedC));
 			}else{
 				result.append(' ');
-			}
+            }
         }
 
         int iterations = 3, freq = iterations * 2;
@@ -89,11 +91,11 @@ public class NameGen{
             result.setLength(0);
 
             for(int i = 0; i < name.length(); i++){
-                String c = ((Character)name.charAt(i)).toString();
-                result.append(c);
+                char c = name.charAt(i);
+                result.append(Character.toString(c));
 
                 if((i + iteration % (freq + 1)) == freq){
-                    String a = Character.toString(8206) + c + Character.toString(8207);
+                    String a = Character.toString(8206) + Character.toString(c) + Character.toString(8207);
                     a = Character.toString(8238) + a + Character.toString(8234);
 
                     result.append(a);
