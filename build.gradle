@@ -1,0 +1,46 @@
+apply plugin: "java"
+
+version '1.0'
+
+sourceCompatibility = 1.8
+
+sourceSets.main.java.srcDirs = [ "src/" ]
+
+repositories{
+    mavenCentral()
+    maven{ url 'https://jitpack.io' }
+}
+
+ext{
+    mainClassName = "namegen.NameGen"
+    appName = "NameGen"
+
+    sdkRoot = System.getenv("ANDROID_HOME")
+    sdkVersion = "30"
+
+    doExec = { cmd ->
+        def proc = cmd.execute(null, new File("$buildDir/libs"))
+        proc.waitForProcessOutput(System.out, System.err)
+    }
+}
+
+task jarAndroid{
+    dependsOn "jar"
+
+    doLast{
+        def files = (configurations.compileClasspath.asList() + configurations.runtimeClasspath.asList() + [new File("$sdkRoot/platforms/android-$sdkVersion/android.jar")])
+        def dependencies = files.collect{ "--classpath $it.path" }.join(" ")
+
+        doExec("d8 $dependencies --min-api 14 --output ${appName}Android.jar ${appName}Desktop.jar")
+    }
+}
+
+jar{
+    archiveFileName = "${appName}Desktop.jar"
+
+    from {configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }}
+
+    manifest{
+        attributes("Main-Class": mainClassName)
+    }
+}
