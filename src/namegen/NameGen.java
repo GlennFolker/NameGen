@@ -14,9 +14,10 @@ public class NameGen{
             try{
                 System.out.print("Generate? (y/n): ");
                 String input = reader.readLine();
-                char option = input.charAt(0);
 
                 if(input.length() == 1){
+                    char option = input.charAt(0);
+
                     switch(option){
                         case 'y':
                             name(reader);
