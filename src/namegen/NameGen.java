@@ -48,7 +48,7 @@ public class NameGen{
 
     public static synchronized void name(BufferedReader reader) throws IOException{
         System.out.print("Enter the target name: ");
-        String name = reader.readLine();
+        String name = reader.readLine().replace("\\n", Character.toString('\n'));
 
         StringBuilder result = new StringBuilder();
         int last, num = 0;
@@ -78,10 +78,9 @@ public class NameGen{
 
             char c = name.charAt(i);
 
-			if(!Character.isWhitespace(c)){
-                result.append(Character.toString(c) + Character.toString(seedC));
-			}else{
-				result.append(' ');
+            result.append(Character.toString(c));
+            if(!Character.isWhitespace(c)){
+                result.append(Character.toString(seedC));
             }
         }
 
