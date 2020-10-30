@@ -30,8 +30,6 @@ public class NameGen{
                         default:
                             Log.log(LogLevel.warn, "Invalid answer! The only options are 'y' or 'n'.");
                     }
-                }else{
-                    Log.log(LogLevel.warn, "Invalid answer! The only options are 'y' or 'n'.");
                 }
             }catch(Exception e){
                 Log.log(LogLevel.error, null, e);
