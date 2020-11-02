@@ -4,8 +4,10 @@ import namegen.Log.*;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.io.*;
+import java.util.*;
 
 public class NameGen{
+    private static Random rand = new Random();
     private static boolean exit = false;
 
     public static synchronized void main(String[] args){
@@ -49,61 +51,43 @@ public class NameGen{
         String name = reader.readLine().replace("\\n", Character.toString('\n'));
 
         StringBuilder result = new StringBuilder();
-        int last, num = 0;
 
-        for(int iteration = 0; iteration < 3; iteration++){
-            for(int i = 0; i < name.length(); i++){
-                last = num;
+        for(int i = 0; i < name.length(); i++){
+            int min = 0x0300;
+            int max = 0x036F;
+            int range = max - min;
 
-                int a = name.codePointAt((i - 1 + name.length()) % name.length());
-                int b = name.codePointAt((i + 1 + name.length()) % name.length());
-                int n = name.codePointAt(i);
+            rand.setSeed(i);
+            int seed = min + rand.nextInt(range + 1);
 
-                num = (n << a >> b) ^ (n >> a << b);
+            char c = name.charAt(i);
 
-                for(int h = 0; h < 2; h++){
-                    int f = name.codePointAt(Math.abs((num + name.length()) % name.length()));
-
-                    if(num <= last){
-                        num ^= f;
-                    }else{
-                        num >>= f;
-                    }
-                }
-
-                int seed = 768 + (num % 111);
-			    int seedB = 710 + (num % 19);
-                int seedC = num <= last ? seed : seedB;
-
-                char c = name.charAt(i);
-
-                result.append(Character.toString(c));
-                if(!Character.isWhitespace(c)){
-                    result.append(Character.toString(seedC));
-                }
+            result.append(Character.toString(c));
+            if(!Character.isWhitespace(c)){
+                result.append(Character.toString(seed));
             }
-
-            name = result.toString();
-            result.setLength(0);
         }
 
         int iterations = 3, freq = iterations * 2;
-        for(int iteration = 0; iteration < iterations; iteration++){
-            for(int i = 0; i < name.length(); i++){
-                char c = name.charAt(i);
-                result.append(Character.toString(c));
 
-                if((i + iteration % (freq + 1)) == freq){
-                    String a = Character.toString(8206) + Character.toString(c) + Character.toString(8207);
-                    a = Character.toString(8238) + a + Character.toString(8234);
-
-                    result.append(a);
-                }
-            }
-
+        for(int it = 0; it < iterations; it++){
             name = result.toString();
             result.setLength(0);
+
+            for(int i = 0; i < name.length(); i++){
+                char c = name.charAt(i);
+
+                if(i % (freq + 1) == freq){
+                    CharSequence a = Character.toString(8206) + Character.toString(c) + Character.toString(8207);
+                    result.append(a);
+                }else{
+                    result.append(Character.toString(c));
+                }
+            }
         }
+
+        name = result.toString();
+        result.setLength(0);
 
         boolean success = setClipboardString(name);
         if(success){
