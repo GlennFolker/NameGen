@@ -1,12 +1,12 @@
 package namegen;
 
 import namegen.Log.*;
+import java.awt.*;
+import java.awt.datatransfer.*;
 import java.io.*;
-import java.nio.charset.*;
 
 public class NameGen{
     private static boolean exit = false;
-    private static File file = new File("name.txt");
 
     public static synchronized void main(String[] args){
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -100,14 +100,26 @@ public class NameGen{
             }
         }
 
-        try(
-            FileOutputStream output = new FileOutputStream(file, false);
-            OutputStreamWriter writer = new OutputStreamWriter(output, StandardCharsets.UTF_16);
-        ){
-            writer.write(name);
-            writer.flush();
-        }finally{
-            Log.log(LogLevel.info, "Generated name is in: @!", file.getAbsolutePath());
+        boolean success = setClipboardString(result.toString());
+        if(success){
+            Log.log(LogLevel.info, "Generated name has been copied to clipboard!");
+        }else{
+            Log.log(LogLevel.warn, "Couldn't copy the generated name to clipboard!");
+        }
+    }
+
+    public static synchronized boolean setClipboardString(String contents){
+        try{
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            StringSelection data = new StringSelection(contents);
+
+            clipboard.setContents(data, data);
+
+            return true;
+        }catch(Exception e){
+            Log.log(LogLevel.error, null, e);
+
+            return false;
         }
     }
 }
