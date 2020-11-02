@@ -51,42 +51,44 @@ public class NameGen{
         StringBuilder result = new StringBuilder();
         int last, num = 0;
 
-        for(int i = 0; i < name.length(); i++){
-            last = num;
+        for(int iteration = 0; iteration < 3; iteration++){
+            for(int i = 0; i < name.length(); i++){
+                last = num;
 
-            int a = name.codePointAt((i - 1 + name.length()) % name.length());
-            int b = name.codePointAt((i + 1 + name.length()) % name.length());
-            int n = name.codePointAt(i);
+                int a = name.codePointAt((i - 1 + name.length()) % name.length());
+                int b = name.codePointAt((i + 1 + name.length()) % name.length());
+                int n = name.codePointAt(i);
 
-            num = (n << a >> b) ^ (n >> a << b);
+                num = (n << a >> b) ^ (n >> a << b);
 
-            for(int h = 0; h < 2; h++){
-                int f = name.codePointAt(Math.abs((num + name.length()) % name.length()));
+                for(int h = 0; h < 2; h++){
+                    int f = name.codePointAt(Math.abs((num + name.length()) % name.length()));
 
-                if(num <= last){
-                    num ^= f;
-                }else{
-                    num >>= f;
+                    if(num <= last){
+                        num ^= f;
+                    }else{
+                        num >>= f;
+                    }
+                }
+
+                int seed = 768 + (num % 111);
+			    int seedB = 710 + (num % 19);
+                int seedC = num <= last ? seed : seedB;
+
+                char c = name.charAt(i);
+
+                result.append(Character.toString(c));
+                if(!Character.isWhitespace(c)){
+                    result.append(Character.toString(seedC));
                 }
             }
 
-            int seed = 768 + (num % 111);
-			int seedB = 710 + (num % 19);
-            int seedC = num <= last ? seed : seedB;
-
-            char c = name.charAt(i);
-
-            result.append(Character.toString(c));
-            if(!Character.isWhitespace(c)){
-                result.append(Character.toString(seedC));
-            }
+            name = result.toString();
+            result.setLength(0);
         }
 
         int iterations = 3, freq = iterations * 2;
         for(int iteration = 0; iteration < iterations; iteration++){
-            name = result.toString();
-            result.setLength(0);
-
             for(int i = 0; i < name.length(); i++){
                 char c = name.charAt(i);
                 result.append(Character.toString(c));
@@ -98,9 +100,12 @@ public class NameGen{
                     result.append(a);
                 }
             }
+
+            name = result.toString();
+            result.setLength(0);
         }
 
-        boolean success = setClipboardString(result.toString());
+        boolean success = setClipboardString(name);
         if(success){
             Log.log(LogLevel.info, "Generated name has been copied to clipboard!");
         }else{
