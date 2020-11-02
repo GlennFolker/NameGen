@@ -15,7 +15,7 @@ public class NameGen{
                 System.out.print("Generate? (y/n): ");
                 String input = reader.readLine();
 
-                if(input.length() == 1){
+                if(input.length() > 0){
                     char option = input.charAt(0);
 
                     switch(option){
